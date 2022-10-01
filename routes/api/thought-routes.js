@@ -5,6 +5,8 @@ const {
   createThough,
   updateThought,
   deleteThought,
+  addReply,
+  removeReply,
 } = require('../../controllers/thought-controller');
 const { route } = require('./user-routes');
 
