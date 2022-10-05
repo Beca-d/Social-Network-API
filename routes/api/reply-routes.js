@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const {
-  addReply,
-  removeReply,
+  createReply,
+  deleteReply,
 } = require('../../controllers/thought-controller');
 
-//  /api/replies/<thoughtId>
-router.route('/:thoughtId').post(addReply);
+// POST (create) reply route at /api/replies/<thoughtId>
+router.route('/:thoughtId').post(createReply);
 
-//  /api/replies/<thoughtId>/<id>
-router.route('/:thoughtId/:id').delete(removeReply);
+//  DELETE reply route at /api/replies/<thoughtId>/<id>
+router.route('/:thoughtId/:id').delete(deleteReply);
 
 module.exports = router;

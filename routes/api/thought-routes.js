@@ -2,22 +2,22 @@ const router = require('express').Router();
 const {
   getAllThought,
   getThoughtByID,
-  createThough,
+  createThought,
   updateThought,
   deleteThought,
-  addReply,
-  removeReply,
 } = require('../../controllers/thought-controller');
 const { route } = require('./user-routes');
 
-//  /api/thoughts/
+// GET all thoughts route at /api/thoughts/
 router.route('/').get(getAllThought);
 
-// /api/thoughts/<userid>
-router.route('/:userid').post(createThough);
+// POST a new thought route at /api/thoughts/<userid>
+router.route('/:userid').post(createThought);
+
+// GET or PUT (update) a thought route at /api/thoughts/<thoughtID>
 router.route('/:id').get(getThoughtByID).put(updateThought);
 
-// // /api/thoughts/<userid>/<thoughtid>
+// DELETE a thought route at /api/thoughts/<userid>/<thoughtID>
 router.route('/:userid/:id').delete(deleteThought);
 
 module.exports = router;

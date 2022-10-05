@@ -1,41 +1,39 @@
 const { findById } = require('../models/User');
-const { user, thought } = require('./../models');
+const { User, Thought } = require('./../models');
 
 const userController = {
-  // Get All User
-  getAllUser(req, res) {
-    user.find({})
+  // Get All Users
+  getAllUsers(req, res) {
+    User.find({})
       .populate({
         path: 'thoughts',
-        select: '-__v',
       })
       .populate({
         path: 'friends',
-        select: '-__v',
       })
+      .sort({ _id: -1 })
       .then((userData) => res.json(userData))
       .catch((err) => {
         console.log(err);
         res.status(400).json(err);
       });
   },
+
   //Get User By ID
   getUserById({ params }, res) {
-    user.findOne({ _id: params.id })
+    User.findOne({ _id: params.id })
       .populate({
         path: 'thoughts',
-        select: '-__v',
       })
       .populate({
         path: 'friends',
-        select: '-__v',
       })
       .then((userData) => {
         if (!userData) {
-          res.status(400).json({ message: 'No matched User found' });
+          res.status(400).json({ 
+            message: `No user found with ID: ${params.id}` });
           return;
         }
-
         res.status(200).json(userData);
       })
       .catch((err) => {
@@ -43,9 +41,10 @@ const userController = {
         res.status(400).json(err);
       });
   },
-  // Create a User
+
+  // Create a new user
   createUser({ body }, res) {
-    user.create(body)
+    User.create(body)
       .then((userData) => {
         res.status(201).json(userData);
       })
@@ -54,35 +53,36 @@ const userController = {
         res.status(400).json(err);
       });
   },
-  // Update a User
+
+  // Update User by ID
   updateUser({ params, body }, res) {
-    user.findByIdAndUpdate({ _id: params.id }, body, {
-      //return the updated value
+    User.findByIdAndUpdate({ _id: params.id }, body, {
       new: true,
     }).then((userData) => {
       if (!userData) {
         res.status(400).json({
-          message: `No user found with the matching id = ${params.id}`,
+          message: `No user found with ID: ${params.id}`,
         });
         return;
       }
       res.status(200).json(userData);
     });
   },
+
   // Delete a User
   deleteUser({ params }, res) {
-    user.findOneAndDelete({ _id: params.id }).then((userData) => {
+    User.findOneAndDelete({ _id: params.id }).then((userData) => {
       if (!userData) {
         res
           .status(400)
-          .json({ message: `No User found with the id = ${params.id}` });
+          .json({ message: `No User found with ID: ${params.id}` });
       }
 
-      return thought.deleteMany({ _id: userData.thoughts }).then(
+      return Thought.deleteMany({ _id: userData.thoughts }).then(
         (thoughtData) => {
           if (!thoughtData) {
             res.status(400).json({
-              message: `No Thought found associated with id's = ${userData.thoughts}`,
+              message: `No Thought found with IDs: ${userData.thoughts}`,
             });
             return;
           }
@@ -94,15 +94,15 @@ const userController = {
 
   // Add friend
   addFriend({ params }, res) {
-    user.findByIdAndUpdate(
+    User.findByIdAndUpdate(
       { _id: params.userId },
-      { $set: { friends: params.friendId } },
+      { $addToSet: { friends: params.friendId } },
       { new: true }
     ).then((friendData) => {
       if (!friendData) {
         res
           .status(400)
-          .json({ message: `No User found with the ID={params.userId}` });
+          .json({ message: `No User found with ID: ${params.userId}` });
         return;
       }
       res.status(200).json(friendData);
@@ -111,7 +111,7 @@ const userController = {
 
   // Delete Friend
   removeFriend({ params }, res) {
-    user.findByIdAndUpdate(
+    User.findByIdAndUpdate(
       { _id: params.userId },
       { $pull: { friends: params.friendId } },
       { new: true }
@@ -119,7 +119,7 @@ const userController = {
       if (!friendData) {
         res
           .status(400)
-          .json({ message: `No User found with the ID={params.userId}` });
+          .json({ message: `No User found with ID: ${params.userId}` });
         return;
       }
       res.status(200).json(friendData);

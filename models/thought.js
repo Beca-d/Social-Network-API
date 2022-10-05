@@ -3,6 +3,7 @@ const dateFormat = require('../utils/dateFormat');
 
 const reactionSchema = new Schema(
   {
+    // replies to thoughts requirements 
     reactionID: {
       type: Schema.Types.ObjectId,
       default: () => new Types.ObjectId(),
@@ -10,7 +11,8 @@ const reactionSchema = new Schema(
     reactionBody: {
       type: String,
       require: true,
-      max: 280,
+      min: 1,
+      max: 250,
     },
     username: {
       type: String,
@@ -29,6 +31,7 @@ const reactionSchema = new Schema(
 
 const thoughtSchema = new Schema(
   {
+    // requirments for thoughts
     thoughtText: {
       type: String,
       required: true,
@@ -40,12 +43,11 @@ const thoughtSchema = new Schema(
       default: Date.now(),
       get: (createdAtVal) => dateFormat(createdAtVal),
     },
-    //   User that created the thought
     username: {
       type: String,
       required: true,
     },
-    // association of reactions and thoughts
+    // replies and thoughts linked
     reactions: [reactionSchema],
   },
   {
@@ -57,11 +59,11 @@ const thoughtSchema = new Schema(
   }
 );
 
-// Virtual for the calculation of replies
+// Count number of replies per thought with virtual
 thoughtSchema.virtual('reactionCount ').get(function () {
   return this.reactions.length;
 });
 
-const thought = model('thought', thoughtSchema);
+const Thought = model('Thought', thoughtSchema);
 
-module.exports = thought;
+module.exports = Thought;
