@@ -44,19 +44,18 @@ const thoughtController = {
           });
           return;
         }
-        res.json(userData);
+        res.status(200).json(userData);
       })
       .catch((err) => res.json(err));
   },
 
   //  Update thought by id
   updateThought({ params, body }, res) {
-    Thought.findOneAndUpdate({ _id: params.id }, body, {
+    Thought.findByIdAndUpdate({ _id: params.id }, body, {
       new: true,
-      runValidators: true,
     }).then((thoughtData) => {
       if (!thoughtData) {
-        res.json({
+        res.status(400).json({
           message: `No thought found with ID: ${params.id}`,
         });
       }
